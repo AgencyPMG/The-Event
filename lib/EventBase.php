@@ -132,7 +132,7 @@ class EventBase
         return $labels;
     }
 
-    protected static function gen_tax_labels($singular, $pluarl)
+    protected static function gen_tax_labels($singular, $plural)
     {
         $labels = array(
             'name'                  => $plural,
@@ -148,7 +148,7 @@ class EventBase
             'new_item_name'         => sprintf(__('New %s Name', 'the-event'), $singular),
             'separate_items_with_commas' => sprintf(__('Seperate %s with commas', 'the-event'), strtolower($plural)),
             'add_or_remove_items'   => sprintf(__('Add or Remove %s', 'the-event'), $plural),
-            'choose_from_most_uses' => sprintf(__('Choose from most used %s', 'the-event'), strtolower($plural)),
+            'choose_from_most_used' => sprintf(__('Choose from most used %s', 'the-event'), strtolower($plural)),
         );
 
         return $labels;
