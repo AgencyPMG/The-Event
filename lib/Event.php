@@ -28,13 +28,13 @@ class Event extends EventBase
         add_action(
             'init',
             array(__CLASS__, 'register_cat'),
-            11
+            20
         );
 
         add_action(
             'init',
             array(__CLASS__, 'register_tag'),
-            11
+            20
         );
     }
 
@@ -77,6 +77,7 @@ class Event extends EventBase
             _x('Category', 'pmg_event_cat', 'the-event'),
             _x('Categories', 'pm_event_cat', 'the-event')
         );
+        $labels['menu_name'] = __('Event Categories', 'the-event');
 
         $slug = static::opt('cat_slug', 'event-category');
         if(!$slug)
@@ -104,6 +105,7 @@ class Event extends EventBase
             _x('Tag', 'pmg_event_tag', 'the-event'),
             _x('Tags', 'pmg_event_tag', 'the-event')
         );
+        $labels['menu_name'] = __('Event Tags', 'the-event');
 
         $slug = static::opt('tag_slug', 'event-tag');
         if(!$slug)
