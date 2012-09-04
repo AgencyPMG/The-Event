@@ -38,6 +38,20 @@ class EventBase
     const VENUE_TYPE = 'pmg_venue';
 
     /**
+     * Event category key.
+     *
+     * @since   0.1
+     */
+    const EVENT_CAT = 'pmg_event_cat';
+
+    /**
+     * Event tag key.
+     *
+     * @since   0.1
+     */
+    const EVENT_TAG = 'pmg_event_tag';
+
+    /**
      * The option key.
      *
      * @since   0.1
