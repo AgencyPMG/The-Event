@@ -28,4 +28,28 @@ License: GPL2
 
 namespace PMG\TheEvent;
 
+!defined('ABSPATH') && exit;
+
 define('PMG_TE_PATH', plugin_dir_path(__FILE__));
+
+spl_autoload_register(__NAMESPACE__ . '\\autoloader');
+/**
+ * Autoloader function.
+ *
+ * @since   0.1
+ * @param   string $cls The class name.
+ * @return  null
+ */
+function autoloader($cls)
+{
+    $cls = ltrim($cls, '\\');
+    if(strpos($cls, __NAMESPACE__) !== 0)
+        return; // not this namespace
+
+    $cls = str_replace(__NAMESPACE__, '', $cls);
+
+    $path = PMG_TE_PATH . 'lib' .
+        str_replace('\\', DIRECTORY_SEPARATOR, $cls) . '.php';
+
+    require_once($path);
+}
