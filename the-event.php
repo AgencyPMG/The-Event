@@ -53,3 +53,7 @@ function autoloader($cls)
 
     require_once($path);
 }
+
+Event::init();
+Artist::init();
+Venue::init();
