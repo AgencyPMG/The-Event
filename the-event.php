@@ -58,3 +58,4 @@ function autoloader($cls)
 Event::init();
 Artist::init();
 Venue::init();
+P2PIntegration::init();
