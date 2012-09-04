@@ -96,4 +96,47 @@ class EventBase
 
         return true;
     }
+
+    protected static function gen_type_labels($singular, $plural)
+    {
+        $labels = array(
+            'name'              => $plural,
+            'singular_name'     => $singular,
+            'add_new'           => sprintf(__('New %s', 'the-event'), $singular),
+            'all_items'         => sprintf(__('All %s', 'the-event'), $plural),
+            'edit_item'         => sprintf(__('Edit %s', 'the-event'), $singular),
+            'view_item'         => sprintf(__('View %s', 'the-event'), $singular),
+            'search_items'      => sprintf(__('Search %s', 'the-event'), $plural),
+            'not_found'         => sprintf(__('No %s Found', 'the-event'), $plural),
+            'parent_item_colon' => sprintf(__('Parent %s:', 'the-event'), $singualr)
+        );
+
+        $labels['add_new_item'] = $labels['add_new'];
+        $labels['new_item'] = $labels['add_new'];
+        $labels['not_found_in_trash'] = $labels['not_found'];
+
+        return $labels;
+    }
+
+    protected static function gen_tax_labels($singular, $pluarl)
+    {
+        $labels = array(
+            'name'                  => $plural,
+            'singular_name'         => $singular,
+            'search_items'          => sprintf(__('Search %s', 'the-event'), $plural),
+            'popular_items'         => sprintf(__('Popular %s', 'the-event'), $plural),
+            'all_items'             => sprintf(__('All %s', 'the-event'), $plural),
+            'parent_item'           => sprintf(__('Parent %s', 'the-event'), $singular),
+            'parent_item_colon'     => sprintf(__('Parent %s:', 'the-event'), $singular),
+            'edit_item'             => sprintf(__('Edit %s', 'the-event'), $singular),
+            'update_item'           => sprintf(__('Update $s', 'the-event'), $singular),
+            'add_new_item'          => sprintf(__('New %s', 'the-event'), $singular),
+            'new_item_name'         => sprintf(__('New %s Name', 'the-event'), $singular),
+            'separate_items_with_commas' => sprintf(__('Seperate %s with commas', 'the-event'), strtolower($plural)),
+            'add_or_remove_items'   => sprintf(__('Add or Remove %s', 'the-event'), $plural),
+            'choose_from_most_uses' => sprintf(__('Choose from most used %s', 'the-event'), strtolower($plural)),
+        );
+
+        return $labels;
+    }
 }
