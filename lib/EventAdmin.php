@@ -39,6 +39,11 @@ class EventAdmin extends Event
             2
         );
 
+        add_action(
+            'load-edit.php',
+            array(__CLASS__, 'load_edit')
+        );
+
         add_filter(
             'wp_insert_post_data',
             array(__CLASS__, 'change_dates'),
@@ -108,7 +113,6 @@ class EventAdmin extends Event
             'publish' => __('Active', 'the-event'),
             'draft'   => __('Inactive', 'the-event'),
             'private' => __('Private', 'the-event'),
-            'trash'   => __('Trashed', 'the-event'),
         ));
         ?>        
         <div id="preview-action" class="misc-pub-section">
@@ -196,6 +200,151 @@ class EventAdmin extends Event
         if(isset($_POST[$k]))
         {
             self::$ff->save($post_id, $_POST[$k]);
+        }
+    }
+
+    public static function load_edit()
+    {
+        $pt = isset($_GET['post_type']) && $_GET['post_type'] ?
+            $_GET['post_type'] : false;
+
+        if(!$pt || $pt != static::EVENT_TYPE)
+            return;
+
+        add_filter(
+            'display_post_states',
+            array(__CLASS__, 'change_states')
+        );
+
+        add_filter(
+            'views_' . get_current_screen()->id,
+            array(__CLASS__, 'views')
+        );
+
+        add_filter(
+            'manage_edit-' . static::EVENT_TYPE . '_columns',
+            array(__CLASS__, 'add_columns')
+        );
+
+        add_filter(
+            'manage_edit-' . static::EVENT_TYPE . '_sortable_columns',
+            array(__CLASS__, 'sortable')
+        );
+
+        add_action(
+            'manage_' . self::EVENT_TYPE . '_posts_custom_column',
+            array(__CLASS__, 'column_cb'),
+            10,
+            2
+        );
+    }
+
+    public static function change_states($s)
+    {
+        if(isset($s['draft']))
+            $s['draft'] = __('Inactive', 'the-event');
+
+        if(isset($s['publish']))
+            $s['publish'] = __('Active', 'the-event');
+
+        return $s;
+    }
+
+    public static function views($views)
+    {
+        if(isset($views['publish']))
+        {
+            $views['publish'] = sprintf(
+                '<a href="%s" %s>%s</span></a>',
+                add_query_arg(array(
+                    'post_type'     => static::EVENT_TYPE,
+                    'post_status'   => 'publish',
+                ), admin_url('edit.php')),
+                isset($_GET['post_status']) && 'publish' == $_GET['post_status'] ?
+                    'class="current"' : '',
+                esc_html__('Active', 'the-event')
+            );
+        }
+
+        if(isset($views['draft']))
+        {
+            $views['draft'] = sprintf(
+                '<a href="%s" %s>%s</span></a>',
+                add_query_arg(array(
+                    'post_type'     => static::EVENT_TYPE,
+                    'post_status'   => 'draft',
+                ), admin_url('edit.php')),
+                isset($_GET['post_status']) && 'draft' == $_GET['post_status'] ?
+                    'class="current"' : '',
+                esc_html__('Inactive', 'the-event')
+            );
+        }
+
+        return $views;
+    }
+
+    public static function add_columns($cols)
+    {
+        $cols = array(
+            'cb'     => '<input type="checkbox" />',
+            'title'  => __('Event', 'the-event'),
+            'e_date' => __('Event Date', 'the-event'),
+        );
+
+        if(function_exists('p2p_type'))
+        {
+            $cols['artist'] = __('Artist/Presenter', 'the-event');
+            $cols['venue'] = __('Venue', 'the-event');
+        }
+
+        return $cols;
+    }
+
+    public static function sortable($cols)
+    {
+        $cols['e_date'] = 'date';
+        return $cols;
+    }
+
+    public static function column_cb($col, $post_id)
+    {
+        // there has to be a way to use p2p_type()->each_connected here...
+
+        $post = get_post($post_id);
+        switch($col)
+        {
+            case 'e_date':
+                echo date_i18n(
+                    get_option('date_format'),
+                    strtotime($post->post_date)
+                );
+                break;
+            case 'artist':
+                $artists = p2p_type(P2PIntegration::E_TO_A)->get_connected($post);
+                if($artists->have_posts())
+                {
+                    echo implode(__(', ', 'the-event'), array_map(function($i) {
+                        return esc_html($i->post_title);
+                    }, $artists->posts));
+                }
+                else
+                {
+                    esc_html_e('No Artists', 'the-event');
+                }
+                break;
+            case 'venue':
+                $venues = p2p_type(P2PIntegration::E_TO_V)->get_connected($post);
+                if($venues->have_posts())
+                {
+                    echo implode(__(', ', 'the-event'), array_map(function($i) {
+                        return esc_html($i->post_title);
+                    }, $venues->posts));
+                }
+                else
+                {
+                    esc_html_e('No Venue', 'the-event');
+                }
+                break;
         }
     }
 
