@@ -59,3 +59,8 @@ Event::init();
 Artist::init();
 Venue::init();
 P2PIntegration::init();
+
+if(is_admin())
+{
+    EventAdmin::init();
+}
