@@ -70,15 +70,7 @@ class FieldFactory
             $this->meta = new MetaFactory($this->type, $this->prefix);
     }
 
-    protected function error($msg)
-    {
-        echo esc_html($msg);
-    }
-
-    protected function gen_name($key)
-    {
-        return is_null($this->opt) ? $key : sprintf('%s[%s]', $this->opt, $key);
-    }
+    /********** Field Callbakcs **********/
 
     protected function input($type, $value, $key, $cls='widefat')
     {
@@ -173,6 +165,17 @@ class FieldFactory
             $this->fields[$key]['value'] = $this->meta->get($id, $key);
         }
     }
+
+    protected function error($msg)
+    {
+        echo esc_html($msg);
+    }
+
+    protected function gen_name($key)
+    {
+        return is_null($this->opt) ? $key : sprintf('%s[%s]', $this->opt, $key);
+    }
+
 
     /********** Public API **********/
 
