@@ -13,15 +13,32 @@ namespace PMG\TheEvent;
 
 !defined('ABSPATH') && exit;
 
-class MetaFactory
+class Meta
 {
-    private $type;
-    private $prefix;
+    private static $prefix = '';
 
-    public function __construct($type, $prefix)
+    private static $registry = array();
+
+    private $type;
+
+    protected function __construct($type)
     {
         $this->type = $type;
-        $this->prefix = $prefix;
+    }
+
+    public static function instance($type)
+    {
+        if(isset(self::$registry[$type]))
+            return self::$registry[$type];
+
+        self::$registry[$type] = new self($type);
+
+        return self::$registry[$type];
+    }
+
+    public static function set_prefix($prefix)
+    {
+        self::$prefix = $prefix;
     }
 
     protected function get_key($k)

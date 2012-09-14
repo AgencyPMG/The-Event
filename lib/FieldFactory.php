@@ -34,25 +34,6 @@ class FieldFactory
     private $type = null;
 
     /**
-     * The meta prefix.  Used internally to fetch data for items outside the 
-     * settings API.
-     *
-     * @since   1.0
-     * @access  private
-     * @var     string
-     */
-    private $prefix = null;
-
-    /**
-     * Container for the meta factory.
-     *
-     * @since   1.0
-     * @access  private
-     * @var
-     */
-    private $meta = null;
-
-    /**
      * Container for registered form fields
      *
      * @since   1.0
@@ -60,14 +41,10 @@ class FieldFactory
      */
     private $fields;
 
-    public function __construct($opt, $meta_type=false, $meta_prefix=null)
+    public function __construct($opt, $meta_type=false)
     {
         $this->opt = $opt;
         $this->type = $meta_type;
-        $this->prefix = $meta_prefix;
-
-        if($this->type && $this->prefix)
-            $this->meta = new MetaFactory($this->type, $this->prefix);
     }
 
     /********** Field Callbakcs **********/
@@ -160,9 +137,11 @@ class FieldFactory
      */
     protected function setup_values($id)
     {
+        $m = Meta::instance($this->type);
+
         foreach($this->fields as $key => $field)
         {
-            $this->fields[$key]['value'] = $this->meta->get($id, $key);
+            $this->fields[$key]['value'] = $m->get($id, $key);
         }
     }
 
@@ -278,7 +257,7 @@ class FieldFactory
      */
     public function render($id)
     {
-        if(!is_null($this->meta))
+        if($this->type)
             $this->setup_values($id);
 
         echo '<table class="form-table">';
@@ -337,16 +316,18 @@ class FieldFactory
     {
         $values = $this->validate($values);
 
+        $m = Meta::instance($this->type);
+
         foreach($this->fields as $key => $field)
         {
             if(isset($values[$key]))
             {
-                $this->meta->save($id, $key, $values[$key]);
+                $m->save($id, $key, $values[$key]);
             }
             else
             {
                 // not in the validated array, assume it needs to be deleted
-                $this->meta->delete($id, $key);
+                $m->delete($id, $key);
             }
         }
     }
