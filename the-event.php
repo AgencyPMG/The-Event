@@ -65,4 +65,6 @@ P2PIntegration::init();
 if(is_admin())
 {
     EventAdmin::init();
+    ArtistAdmin::init();
+    VenueAdmin::init();
 }

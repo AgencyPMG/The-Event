@@ -54,7 +54,7 @@ class EventAdmin extends Event
 
     public static function fields()
     {
-        $f = new FieldFactory('pmgte_event_info', 'post', 'the_event');
+        $f = new FieldFactory('pmgte_event_info', 'post');
 
         $f->add_field('ticket_url', array(
             'label'     => __('Ticket URL', 'the-event'),
@@ -200,6 +200,12 @@ class EventAdmin extends Event
         if(isset($_POST[$k]))
         {
             self::$ff->save($post_id, $_POST[$k]);
+        }
+        else
+        {
+            // something is wrong.  Just call save with a blank array
+            // which will delete all the meta
+            self::$ff->save($post_id, array());
         }
     }
 
