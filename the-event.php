@@ -67,4 +67,5 @@ if(is_admin())
     EventAdmin::init();
     ArtistAdmin::init();
     VenueAdmin::init();
+    AdminOptions::init();
 }

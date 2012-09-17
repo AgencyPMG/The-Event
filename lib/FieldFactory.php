@@ -233,13 +233,16 @@ class FieldFactory
      */
     public function add_settings_fields()
     {
+        $opts = get_option($this->opt, array());
         foreach($this->fields as $key => $args)
         {
-            $n = $this->gen_nam($key);
+            $n = $this->gen_name($key);
             $args['label_for'] = $n;
+            $args['value'] = isset($opts[$key]) ? $opts[$key] : '';
 
             add_settings_field(
                 $n,
+                $args['label'],
                 array($this, 'cb'),
                 $args['page'],
                 $args['section'],
