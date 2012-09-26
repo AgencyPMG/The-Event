@@ -60,6 +60,19 @@ function te_ticket_url()
         te_get_ticket_url($post), $post->ID);
 }
 
+function te_get_external_url($post)
+{
+    return apply_filters('te_get_external_url',
+        Meta::instance('post')->get($post->ID, 'external_url'), $post-ID);
+}
+
+function te_external_url()
+{
+    global $post;
+
+    echo apply_filters('te_external_url', te_get_external_url($post), $post->ID);
+}
+
 function te_get_ticket_price($post)
 {
     return apply_filters('te_get_ticket_price',

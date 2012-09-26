@@ -61,6 +61,11 @@ class EventAdmin extends Event
             'cleaners'  => array('esc_url_raw'),
         ));
 
+        $f->add_field('external_url', array(
+            'label'     => __('External URL', 'the-event'),
+            'cleaners'  => array('esc_url_raw'),
+        ));
+
         $f->add_field('cost', array(
             'label'     => __('Ticket Price', 'the-event'),
         ));
