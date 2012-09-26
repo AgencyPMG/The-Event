@@ -36,6 +36,18 @@ class Event extends EventBase
             array(__CLASS__, 'register_tag'),
             20
         );
+
+        add_action(
+            'pre_get_posts',
+            array(__CLASS__, 'set_order')
+        );
+
+        add_filter(
+            'posts_where',
+            array(__CLASS__, 'remove_old'),
+            10,
+            2
+        );
     }
 
     public static function register_type()
@@ -125,5 +137,39 @@ class Event extends EventBase
         $args = apply_filters('pmg_event_tag_args', $args);
 
         register_taxonomy(static::EVENT_TAG, static::EVENT_TYPE, $args);
+    }
+
+    public static function set_order($q)
+    {
+        if(is_admin() || !$q->is_main_query())
+            return;
+
+        if(
+            !is_post_type_archive(static::EVENT_TYPE) &&
+            !is_tax(array(static::EVENT_CAT, static::EVENT_TAG))
+        ) return;
+
+        $q->set('orderby', 'post_date post_title');
+        $q->set('order', 'ASC');
+    }
+
+    public static function remove_old($where, $q)
+    {
+        if(is_admin() || !$q->is_main_query())
+            return $where;
+
+        if(
+            !is_post_type_archive(static::EVENT_TYPE) &&
+            !is_tax(array(static::EVENT_CAT, static::EVENT_TAG))
+        ) return $where;
+
+        global $wpdb;
+
+        $where .= $wpdb->prepare(
+            " AND {$wpdb->posts}.post_modified >= %s",
+            date('Y-m-d H:i:s')
+        );
+
+        return $where;
     }
 } // end class Event
