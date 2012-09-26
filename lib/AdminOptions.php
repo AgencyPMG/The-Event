@@ -46,6 +46,20 @@ class AdminOptions extends EventBase
             self::OPTION
         );
 
+        add_settings_section(
+            'artists',
+            __('Artist Pages & Archives', 'the-event'),
+            '__return_false',
+            self::OPTION
+        );
+
+        add_settings_section(
+            'venues',
+            __('Venu Pages & Events', 'the-event'),
+            '__return_false',
+            self::OPTION
+        );
+
         $f = new FieldFactory(self::OPTION);
 
         $f->add_field('event_slug', array(
@@ -67,6 +81,32 @@ class AdminOptions extends EventBase
             'cleaners'  => array('sanitize_title_with_dashes'),
             'section'   => 'slugs',
             'class'     => 'regular-text',
+        ));
+
+        $f->add_field('artist_archive_disabled', array(
+            'label'     => __('Disable the Artist Archive', 'the-event'),
+            'section'   => 'artists',
+            'type'      => 'checkbox',
+            'class'     => 'regular',
+        ));
+
+        $f->add_field('artist_page_disabled', array(
+            'label'     => __('Disable Artist Pages', 'the-event'),
+            'section'   => 'artists',
+            'type'      => 'checkbox',
+            'class'     => 'regular',
+        ));
+
+        $f->add_field('venue_archive_disabled', array(
+            'label'     => __('Disable the Venue Archive', 'the-event'),
+            'section'   => 'venues',
+            'type'      => 'checkbox',
+        ));
+
+        $f->add_field('venue_page_disabled', array(
+            'label'     => __('Disable Venue Pages', 'the-event'),
+            'section'   => 'venues',
+            'type'      => 'checkbox',
         ));
 
         $f->add_settings_fields();

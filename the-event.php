@@ -55,7 +55,7 @@ function autoloader($cls)
     require_once($path);
 }
 
-Meta::set_prefix('_the_event');
+Meta::set_prefix(EventBase::PREFIX);
 
 Event::init();
 Artist::init();

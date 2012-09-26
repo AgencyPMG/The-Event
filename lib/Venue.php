@@ -36,17 +36,21 @@ class Venue extends EventBase
         if(!$slug)
             $slug = 'venue';
 
+        $public = self::opt('venue_page_disabled') == 'on' ? false : true;
+
         $args = array(
             'labels'                => $labels,
-            'public'                => true,
+            'public'                => $public,
+            'show_ui'               => true,
             'show_in_nav_menus'     => false,
             'show_in_menu'          => 'edit.php?post_type=' . static::EVENT_TYPE,
             'capability_type'       => 'page',
             'supports'              => array('title', 'editor', 'thumbnail'),
+            'has_archive'           => self::opt('venue_archive_disabled') != 'on',
             'rewrite'               => array(
                 'slug'       => $slug,
                 'with_front' => false
-            )
+            ),
         );
 
         $args = apply_filters('pmg_venue_type_args', $args);

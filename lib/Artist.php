@@ -36,17 +36,21 @@ class Artist extends EventBase
         if(!$slug)
             $slug = 'artist';
 
+        $public = self::opt('artist_page_disabled') == 'on' ? false : true;
+
         $args = array(
             'labels'                => $labels,
-            'public'                => true,
+            'public'                => $public,
+            'show_ui'               => true,
             'show_in_nav_menus'     => false,
             'show_in_menu'          => 'edit.php?post_type=' . static::EVENT_TYPE,
             'capability_type'       => 'page',
             'supports'              => array('title', 'editor', 'thumbnail'),
+            'has_archive'           => self::opt('artist_archive_disabled') != 'on',
             'rewrite'               => array(
                 'slug'       => $slug,
                 'with_front' => false
-            )
+            ),
         );
 
         $args = apply_filters('pmg_artist_type_args', $args);
