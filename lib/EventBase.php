@@ -63,7 +63,7 @@ class EventBase
      *
      * @since   0.1
      */
-    const PREFIX = '_the_event_';
+    const PREFIX = 'the_event';
 
     public static function opt($key, $default='')
     {
