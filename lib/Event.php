@@ -56,7 +56,8 @@ class Event extends EventBase
             'show_in_nav_menus'     => false,
             'menu_position'         => 400, // way low
             'capability_type'       => 'page',
-            'supports'              => array('title', 'editor', 'thumbnail'),
+            'supports'              => array(
+                'title', 'editor', 'thumbnail', 'excerpt'),
             'taxonomies'            => array(static::EVENT_CAT, static::EVENT_TAG),
             'has_archive'           => true,
             'rewrite'               => array(
