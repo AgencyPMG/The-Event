@@ -69,3 +69,6 @@ if(is_admin())
     VenueAdmin::init();
     AdminOptions::init();
 }
+
+// template tags
+require_once(PMG_TE_PATH . 'tt/events.php');
