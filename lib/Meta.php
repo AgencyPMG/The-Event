@@ -43,7 +43,7 @@ class Meta
 
     protected function get_key($k)
     {
-        return "_{$this->prefix}_{$k}";
+        return "_" . static::$prefix . "_{$k}";
     }
 
     public function save($id, $key, $val)

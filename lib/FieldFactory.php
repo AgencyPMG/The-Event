@@ -15,6 +15,9 @@ namespace PMG\TheEvent;
 
 class FieldFactory
 {
+    const CHECK_ON = 'on';
+    const CHECK_OFF = 'off';
+
     /**
      * setting name
      * 
@@ -53,11 +56,12 @@ class FieldFactory
     {
         $name = $this->gen_name($key);
         printf(
-            '<input type="%1$s" class="%2$s" name="%3$s" id="%3$s" value="%4$s" />',
+            '<input type="%1$s" class="%2$s" name="%3$s" id="%3$s" value="%4$s" %5$s />',
             esc_attr($type),
             esc_attr($cls),
             esc_attr($name),
-            esc_attr($value)
+            esc_attr('checkbox' == $type ? $key : $value),
+            'checkbox' == $type ? checked(static::CHECK_ON, $value, false) : ''
         );
     }
 
@@ -69,6 +73,11 @@ class FieldFactory
     protected function password_input($value, $key, $cls='widefat')
     {
         $this->input('password', $value, $key, $cls);
+    }
+
+    protected function checkbox($value, $key, $cls=null, $args)
+    {
+        $this->input('checkbox', $value, $key, '', $args);
     }
 
     protected function textarea($value, $key, $cls='widefat', $args)
@@ -86,7 +95,7 @@ class FieldFactory
     {
         $options = isset($args['options']) ? $args['options'] : array();
         $is_multi = isset($args['multi']) && $args['multi'];
-        $name = $this->gen_name($name);
+        $name = $this->gen_name($key);
 
         if($is_multi)
             $name .= '[]';
@@ -112,9 +121,10 @@ class FieldFactory
             }
 
             printf(
-                '<option value="%1$s" %2$s>%2$s</option>',
+                '<option value="%1$s" %2$s>%3$s</option>',
                 esc_attr($val),
-                $s
+                $s,
+                esc_html($label)
             );
         }
         echo '</select>';
@@ -125,6 +135,27 @@ class FieldFactory
         $args['multi'] = true;
         $this->select($value, $key, $cls, $args);
     }
+
+    protected function radio($value, $key, $cls, $args)
+    {
+        $options = isset($args['options']) ? $args['options'] : array();
+        $name = $this->gen_name($key);
+
+        foreach($options as $val => $label)
+        {
+            echo '<p>';
+            printf(
+                '<label for="%1$s[%2$s]"><input type="radio" name="%1$s" '.
+                'id="%1$s[%2$s]" value="%2$s" %3$s /> %4$s</label>',
+                esc_attr($name),
+                esc_attr($val),
+                checked($value, $val, false),
+                esc_html($label)
+            );
+            echo '</p>';
+        }
+    }
+
 
     /********** Internals **********/
 
@@ -191,11 +222,11 @@ class FieldFactory
         $key = isset($args['key']) ? $args['key'] : false;
 
         if(!$key)
-            $this->error(__('Set a key for this field', 'the-event'));
+            $this->error(__('Set a key for this field', 'marklogic'));
         elseif(method_exists($this, $type))
             $this->$type($value, $key, $cls, $args);
         else
-            $this->error(__('Invalid field type', 'the-event'));
+            $this->error(__('Invalid field type', 'marklogic'));
     }
 
     /**
@@ -297,10 +328,21 @@ class FieldFactory
         {
             if(isset($dirty[$key]) && $dirty[$key])
             {
-                $val = $dirty[$key];
-                foreach($field['cleaners'] as $cb)
-                    $val = call_user_func($cb, $val);
-                $clean[$key] = $val;
+                if('checkbox' == $field['type'])
+                {
+                    $clean[$key] = static::CHECK_ON;
+                }
+                else
+                {
+                    $val = $dirty[$key];
+                    foreach($field['cleaners'] as $cb)
+                        $val = call_user_func($cb, $val);
+                    $clean[$key] = $val;
+                }
+            }
+            elseif('checkbox' == $field['type'])
+            {
+                $clean[$key] = static::CHECK_OFF;
             }
         }
         return $clean;
