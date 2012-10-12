@@ -122,7 +122,7 @@ class EventBase
             'view_item'         => sprintf(__('View %s', 'the-event'), $singular),
             'search_items'      => sprintf(__('Search %s', 'the-event'), $plural),
             'not_found'         => sprintf(__('No %s Found', 'the-event'), $plural),
-            'parent_item_colon' => sprintf(__('Parent %s:', 'the-event'), $singualr)
+            'parent_item_colon' => sprintf(__('Parent %s:', 'the-event'), $singular),
         );
 
         $labels['add_new_item'] = $labels['add_new'];
