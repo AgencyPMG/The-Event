@@ -63,7 +63,7 @@ function te_ticket_url()
 function te_get_external_url($post)
 {
     return apply_filters('te_get_external_url',
-        Meta::instance('post')->get($post->ID, 'external_url'), $post-ID);
+        Meta::instance('post')->get($post->ID, 'external_url'), $post->ID);
 }
 
 function te_external_url()
