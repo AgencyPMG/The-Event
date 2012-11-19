@@ -33,7 +33,7 @@ function te_start_date($fmt=null)
 function te_get_end_date($fmt, $post)
 {
     return apply_filters('te_get_end_date',
-        mysql2date($fmt, $post->post_date), $post->ID);
+        mysql2date($fmt, $post->post_modified), $post->ID);
 }
 
 function te_end_date($fmt=null)
@@ -42,8 +42,8 @@ function te_end_date($fmt=null)
 
     is_null($fmt) && $fmt = get_option('date_format');
 
-    echo apply_filters('te_start_date',
-        te_get_start_date($fmt, $post), $post->ID);
+    echo apply_filters('te_end_date',
+        te_get_end_date($fmt, $post), $post->ID);
 }
 
 function te_get_ticket_url($post)
