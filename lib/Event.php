@@ -155,20 +155,31 @@ class Event extends EventBase
 
     public static function remove_old($where, $q)
     {
-        if(is_admin() || !$q->is_main_query())
-            return $where;
-
-        if(
-            !is_post_type_archive(static::EVENT_TYPE) &&
-            !is_tax(array(static::EVENT_CAT, static::EVENT_TAG))
-        ) return $where;
-
         global $wpdb;
 
-        $where .= $wpdb->prepare(
-            " AND {$wpdb->posts}.post_modified >= %s",
-            date('Y-m-d H:i:s')
-        );
+        if (is_admin() || !$q->is_main_query()) {
+            return $where;
+        }
+
+        if(
+            is_post_type_archive(static::EVENT_TYPE) ||
+            is_tax(array(static::EVENT_CAT, static::EVENT_TAG))
+        ) {
+            $where .= $wpdb->prepare(
+                " AND {$wpdb->posts}.post_modified >= %s",
+                date('Y-m-d H:i:s')
+            );
+        } elseif (is_search()) {
+            $where .= $wpdb->prepare(
+                " AND {$wpdb->posts}.ID NOT IN (
+                    SELECT ID FROM {$wpdb->posts} WHERE
+                    {$wpdb->posts}.post_type = %s AND 
+                    {$wpdb->posts}.post_modified < %s AND
+                    {$wpdb->posts}.post_status = 'publish')",
+                static::EVENT_TYPE,
+                date('Y-m-d H:i:s')
+            );
+        }
 
         return $where;
     }
