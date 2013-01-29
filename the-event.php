@@ -33,27 +33,10 @@ namespace PMG\TheEvent;
 define('PMG_TE_PATH', plugin_dir_path(__FILE__));
 define('PMG_EVENT_EP', 262144);
 
-spl_autoload_register(__NAMESPACE__ . '\\autoloader');
-/**
- * Autoloader function.
- *
- * @since   0.1
- * @param   string $cls The class name.
- * @return  null
- */
-function autoloader($cls)
-{
-    $cls = ltrim($cls, '\\');
-    if(strpos($cls, __NAMESPACE__) !== 0)
-        return; // not this namespace
+require_once PMG_TE_PATH . 'lib/functions.php';
+require_once PMG_TE_PATH . 'tt/events.php';
 
-    $cls = str_replace(__NAMESPACE__, '', $cls);
-
-    $path = PMG_TE_PATH . 'lib' .
-        str_replace('\\', DIRECTORY_SEPARATOR, $cls) . '.php';
-
-    require_once($path);
-}
+spl_autoload_register('pmg_events_autoload');
 
 Meta::set_prefix(EventBase::PREFIX);
 
@@ -62,13 +45,9 @@ Artist::init();
 Venue::init();
 P2PIntegration::init();
 
-if(is_admin())
-{
+if (is_admin()) {
     EventAdmin::init();
     ArtistAdmin::init();
     VenueAdmin::init();
     AdminOptions::init();
 }
-
-// template tags
-require_once(PMG_TE_PATH . 'tt/events.php');
