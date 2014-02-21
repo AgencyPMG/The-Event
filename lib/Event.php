@@ -166,18 +166,18 @@ class Event extends EventBase
             is_tax(array(static::EVENT_CAT, static::EVENT_TAG))
         ) {
             $where .= $wpdb->prepare(
-                " AND {$wpdb->posts}.post_modified >= %s",
-                date('Y-m-d H:i:s')
+                " AND DATE({$wpdb->posts}.post_modified) >= %s",
+                date('Y-m-d')
             );
         } elseif (is_search()) {
             $where .= $wpdb->prepare(
                 " AND {$wpdb->posts}.ID NOT IN (
                     SELECT ID FROM {$wpdb->posts} WHERE
                     {$wpdb->posts}.post_type = %s AND 
-                    {$wpdb->posts}.post_modified < %s AND
+                    DATE({$wpdb->posts}.post_modified) < %s AND
                     {$wpdb->posts}.post_status = 'publish')",
                 static::EVENT_TYPE,
-                date('Y-m-d H:i:s')
+                date('Y-m-d')
             );
         }
 
