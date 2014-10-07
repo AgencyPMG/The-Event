@@ -167,7 +167,7 @@ class Event extends EventBase
         ) {
             $where .= $wpdb->prepare(
                 " AND DATE({$wpdb->posts}.post_modified) >= %s",
-                date('Y-m-d')
+                date('Y-m-d 12:00:00')
             );
         } elseif (is_search()) {
             $where .= $wpdb->prepare(
