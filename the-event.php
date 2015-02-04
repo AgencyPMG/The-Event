@@ -44,6 +44,7 @@ Event::init();
 Artist::init();
 Venue::init();
 P2PIntegration::init();
+JsonApi::init();
 
 if (is_admin()) {
     EventAdmin::init();

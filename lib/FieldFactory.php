@@ -222,11 +222,11 @@ class FieldFactory
         $key = isset($args['key']) ? $args['key'] : false;
 
         if(!$key)
-            $this->error(__('Set a key for this field', 'marklogic'));
+            $this->error(__('Set a key for this field', 'the-event'));
         elseif(method_exists($this, $type))
             $this->$type($value, $key, $cls, $args);
         else
-            $this->error(__('Invalid field type', 'marklogic'));
+            $this->error(__('Invalid field type', 'the-event'));
     }
 
     /**
