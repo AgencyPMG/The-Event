@@ -53,6 +53,16 @@ class P2PIntegration extends EventBase
             'p2p_new_post_args',
             array(__CLASS__, 'publish_new')
         );
+
+        add_filter(
+            'the_event_json_collection',
+            array(__CLASS__, 'add_json_collection_connections')
+        );
+
+        add_filter(
+            'the_event_json_single',
+            array(__CLASS__, 'add_json_single_connections')
+        );
     }
 
     public static function notice()
@@ -117,12 +127,8 @@ class P2PIntegration extends EventBase
             is_post_type_archive(static::EVENT_TYPE) ||
             is_tax(array(static::EVENT_CAT, static::EVENT_TAG))
         ) {
-            p2p_type(static::E_TO_A)->each_connected($q, array(
-                'orderby'   => 'title',
-                'nopaging'  => true
-            ), 'artists');
-
-            p2p_type(static::E_TO_V)->each_connected($q, array(), 'venues');
+            static::add_artists($q);
+            static::add_venues($q);
         }
         elseif(is_singular(static::ARTIST_TYPE))
         {
@@ -150,5 +156,34 @@ class P2PIntegration extends EventBase
         ) $args['post_status'] = 'publish';
 
         return $args;
+    }
+
+    public static function add_json_collection_connections($events)
+    {
+        static::add_artists($events);
+        static::add_venues($events);
+
+        return $events;
+    }
+
+    public static function add_json_single_connections($event)
+    {
+        static::add_artists(array($event));
+        static::add_venues(array($event));
+
+        return $event;
+    }
+
+    private static function add_artists($q)
+    {
+        p2p_type(static::E_TO_A)->each_connected($q, array(
+            'orderby'   => 'title',
+            'nopaging'  => true
+        ), 'artists');
+    }
+
+    private static function add_venues($q)
+    {
+        p2p_type(static::E_TO_V)->each_connected($q, array(), 'venues');
     }
 } // end class P2PIntegration

@@ -42,7 +42,7 @@ class JsonApi extends EventBase
 
     public static function get_events()
     {
-        add_filter('posts_where', array(__CLASS__, 'remove_old'));
+        add_filter('posts_where', array(__CLASS__, 'remove_old'), 10, 2);
         $events = apply_filters('the_event_json_collection', get_posts(array(
             'post_type'         => self::EVENT_TYPE,
             'nopaging'          => true,
@@ -50,7 +50,7 @@ class JsonApi extends EventBase
             'order'             => 'ASC',
             'suppress_filters'  => false,
         )));
-        remove_filter('posts_where', array(__CLASS__, 'remove_old'));
+        remove_filter('posts_where', array(__CLASS__, 'remove_old'), 10);
 
         return array_map(array(__CLASS__, 'prepare_event'), $events);
     }
@@ -68,14 +68,16 @@ class JsonApi extends EventBase
         return static::prepare_event($event);
     }
 
-    public static function remove_old($where)
+    public static function remove_old($where, $q)
     {
         global $wpdb;
 
-        $where .= $wpdb->prepare(
-            " AND DATE({$wpdb->posts}.post_modified) >= %s",
-            date('Y-m-d')
-        );
+        if ($q->get('post_type') === self::EVENT_TYPE) {
+            $where .= $wpdb->prepare(
+                " AND DATE({$wpdb->posts}.post_modified) >= %s",
+                date('Y-m-d')
+            );
+        }
 
         return $where;
     }
@@ -95,7 +97,33 @@ class JsonApi extends EventBase
                 'link'  => $m->get($event->ID, 'ticket_url') ?: null,
                 'cost'  => $m->get($event->ID, 'cost') ?: null,
             ),
+            'artists'       => array(),
+            'venue'         => new \stdClass, // make sure this renders as {}
         );
+
+        if (!empty($event->artists)) {
+            foreach ($event->artists as $artist) {
+                $out['artists'][] = array(
+                    'name'  => $artist->post_title,
+                    'link'  => $m->get($artist->ID, 'artist_url') ?: null,
+                );
+            }
+        }
+
+        if (!empty($event->venues)) {
+            $venue = $event->venues[0];
+            $vid = $venue->ID;
+            $out['venue'] = array(
+                'name'      => $venue->post_title,
+                'city'      => $m->get($vid, 'venue_city') ?: null,
+                'region'    => $m->get($vid, 'venue_state') ?: null,
+                'country'   => $m->get($vid, 'venue_country') ?: null,
+                'postal'    => $m->get($vid, 'venue_zip') ?: null,
+                'street'    => $m->get($vid, 'venue_street_1') ?: null,
+                'street2'   => $m->get($vid, 'venue_street_2') ?: null,
+            );
+        }
+
 
         return apply_filters('the_event_json_event', $out, $event);
     }
