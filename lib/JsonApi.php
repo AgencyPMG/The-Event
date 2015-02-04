@@ -124,6 +124,13 @@ class JsonApi extends EventBase
             );
         }
 
+        if (function_exists('json_url')) {
+            $out['links'] = array(
+                'self'          => json_url(sprintf('/events/%d', $event->ID)),
+                'collection'    => json_url('/events'),
+            );
+        }
+
 
         return apply_filters('the_event_json_event', $out, $event);
     }
