@@ -124,6 +124,9 @@ class JsonApi extends EventBase
             );
         }
 
+        $out['categories'] = static::get_event_categories($event);
+        $out['tags'] = static::get_event_tags($event);
+
         if (function_exists('json_url')) {
             $out['links'] = array(
                 'self'          => json_url(sprintf('/events/%d', $event->ID)),
@@ -133,5 +136,52 @@ class JsonApi extends EventBase
 
 
         return apply_filters('the_event_json_event', $out, $event);
+    }
+
+    private static function get_event_categories($event)
+    {
+        return static::prepare_terms($event, self::EVENT_CAT);
+    }
+
+    private static function get_event_tags($event)
+    {
+        return static::prepare_terms($event, self::EVENT_TAG);
+    }
+
+    private static function prepare_terms($event, $taxonomy)
+    {
+        $terms = get_the_terms($event->ID, $taxonomy);
+        if (!$terms || is_wp_error($terms)) {
+            return [];
+        }
+
+        $out = [];
+        foreach ($terms as $term) {
+            $out[] = static::prepare_term($term);
+        }
+
+        return $out;
+    }
+
+    private static function prepare_term($term)
+    {
+        $base = '/taxonomies/'.$term->taxonomy.'/terms';
+
+        $out = array(
+            'id'            => (int) $term->term_id,
+            'name'          => $term->name,
+            'slug'          => $term->slug,
+            'description'   => $term->description,
+            'html_link'     => get_term_link($term, $term->taxonomy),
+        );
+
+        if (function_exists('json_url')) {
+            $out['links'] = array(
+                'collection' => json_url($base),
+                'self'       => json_url($base.'/'.$term->term_id ),
+            );
+        }
+
+        return $out;
     }
 }
