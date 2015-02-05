@@ -152,10 +152,10 @@ class JsonApi extends EventBase
     {
         $terms = get_the_terms($event->ID, $taxonomy);
         if (!$terms || is_wp_error($terms)) {
-            return [];
+            return array();
         }
 
-        $out = [];
+        $out = array();
         foreach ($terms as $term) {
             $out[] = static::prepare_term($term);
         }
