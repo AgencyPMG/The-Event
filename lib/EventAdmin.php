@@ -377,11 +377,11 @@ class EventAdmin extends Event
             'mn' => 'i'
         );
 
-        foreach(array('start', 'end') as $t)
-        {
+        foreach (array('start', 'end') as $t) {
             $date = array();
-            foreach($types as $k => $d)
+            foreach ($types as $k => $d) {
                 $date[$k] = isset($_POST["te_{$t}_{$k}"]) ? $_POST["te_{$t}_{$k}"] : date($d);
+            }
 
             $fmt = sprintf(
                 '%s-%s-%s %s:%s:00',
@@ -392,10 +392,22 @@ class EventAdmin extends Event
                 $date['mn']
             );
 
-            if('start' == $t)
+            // this is ridiculous, but I guess it's how one does form validation
+            // in WordPress? At least it's what WordPress itself does for post
+            // dates. Awful.
+            if (!wp_checkdate($date['mm'], $date['jj'], $date['aa'], $fmt)) {
+                wp_die(
+                    sprintf(__("You've entered an invalid %s date.", 'the-event'), $t),
+                    __('Invalid Date', 'the-event'),
+                    array('response' => 400)
+                );
+            }
+
+            if ('start' == $t) {
                 $data['post_date'] = $fmt;
-            else
+            } else {
                 $data['post_modified'] = $fmt;
+            }
         }
 
         return $data;
