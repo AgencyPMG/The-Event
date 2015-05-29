@@ -50,6 +50,9 @@ class EventAdmin extends Event
             10,
             2
         );
+
+        add_action('load-post.php', array(__CLASS__, 'load_edit_screen'));
+        add_action('load-post-new.php', array(__CLASS__, 'load_edit_screen'));
     }
 
     public static function fields()
@@ -120,18 +123,16 @@ class EventAdmin extends Event
             'private' => __('Private', 'the-event'),
         ));
         ?>        
-        <div id="preview-action" class="misc-pub-section">
+        <div id="preview-action">
             <?php
-            if('publish' == $post->post_status)
-            {
+            if ('publish' == $post->post_status) {
                 $preview_link = esc_url(get_permalink($post->ID));
                 $preview_button = __('Preview Changes', 'the-event');
-            }
-            else
-            {
+            } else {
                 $preview_link = get_permalink($post->ID);
-                if (is_ssl() )
+                if (is_ssl()) {
                     $preview_link = str_replace('http://', 'https://', $preview_link);
+                }
                 $preview_link = esc_url(apply_filters(
                     'preview_post_link',
                     add_query_arg('preview', 'true', $preview_link)
@@ -146,7 +147,7 @@ class EventAdmin extends Event
                 tabindex="4"><?php echo $preview_button; ?></a></p>
             <input type="hidden" name="wp-preview" id="wp-preview" value="" />
         </div>
-        <div class="misc-pub-section">
+        <div>
                 <label for="the_event_status">
                     <strong><?php _e('Status:', 'the-event'); ?></strong>
                 </label>
@@ -159,13 +160,13 @@ class EventAdmin extends Event
                     <?php endforeach; ?>
                 </select>
         </div>
-        <div class="misc-pub-section timestampdiv">
-            <p>
+        <div>
+            <p class="te-start-time">
                 <strong><?php esc_html_e('Start Date', 'the-event'); ?></strong>
                 <br />
                 <?php self::date_fields($post->post_date); ?>
             </p>
-            <p>
+            <p class="te-end-time">
                 <strong><?php esc_html_e('End Date', 'the-event'); ?></strong>
                 <br />
                 <?php self::date_fields($post->post_modified, 'end'); ?>
@@ -377,11 +378,11 @@ class EventAdmin extends Event
             'mn' => 'i'
         );
 
-        foreach(array('start', 'end') as $t)
-        {
+        foreach (array('start', 'end') as $t) {
             $date = array();
-            foreach($types as $k => $d)
+            foreach ($types as $k => $d) {
                 $date[$k] = isset($_POST["te_{$t}_{$k}"]) ? $_POST["te_{$t}_{$k}"] : date($d);
+            }
 
             $fmt = sprintf(
                 '%s-%s-%s %s:%s:00',
@@ -392,13 +393,52 @@ class EventAdmin extends Event
                 $date['mn']
             );
 
-            if('start' == $t)
+            // this is ridiculous, but I guess it's how one does form validation
+            // in WordPress? At least it's what WordPress itself does for post
+            // dates. Awful.
+            if (!wp_checkdate($date['mm'], $date['jj'], $date['aa'], $fmt)) {
+                wp_die(
+                    sprintf(__("You've entered an invalid %s date.", 'the-event'), $t),
+                    __('Invalid Date', 'the-event'),
+                    array('response' => 400)
+                );
+            }
+
+            if ('start' == $t) {
                 $data['post_date'] = $fmt;
-            else
+            } else {
                 $data['post_modified'] = $fmt;
+            }
         }
 
         return $data;
+    }
+
+    public static function load_edit_screen()
+    {
+        $screen = get_current_screen();
+        if (!isset($screen->post_type) || self::EVENT_TYPE !== $screen->post_type) {
+            return;
+        }
+
+        add_action('admin_enqueue_scripts', array(__CLASS__, 'enqueue'));
+    }
+
+    public static function enqueue()
+    {
+        wp_enqueue_script(
+            'pmg_te_edit_event',
+            PMG_TE_URL.'assets/js/events.js',
+            array('jquery'),
+            self::ASSET_VERSION
+        );
+
+        wp_enqueue_style(
+            'pmg_te_edit_event',
+            PMG_TE_URL.'assets/css/events.css',
+            array(),
+            self::ASSET_VERSION
+        );
     }
 
     protected static function date_fields($post_date, $prefix='start')
@@ -413,7 +453,7 @@ class EventAdmin extends Event
         $hh = mysql2date( 'H', $post_date, false );
         $mn = mysql2date( 'i', $post_date, false );
 
-        $month = "<select name='{$prefix}_mm'>";
+        $month = "<select name='{$prefix}_mm' class='mm'>";
         for ( $i = 1; $i < 13; $i = $i +1 ) {
             $monthnum = zeroise($i, 2);
             $month .= '<option value="' . $monthnum . '"';
@@ -427,16 +467,16 @@ class EventAdmin extends Event
         }
         $month .= '</select>';
 
-        $day = '<input type="text" name="' . $prefix . '_jj" id="jj" ' .
+        $day = '<input type="text" name="' . $prefix . '_jj" class="jj" ' .
             'value="' . $jj . '" size="2" maxlength="2" autocomplete="off" />';
 
-        $year = '<input type="text" name="' . $prefix . '_aa" id="aa" ' .
+        $year = '<input type="text" name="' . $prefix . '_aa" class="aa" ' .
             'value="' . $aa . '" size="4" maxlength="4" autocomplete="off" />';
 
-        $hour = '<input type="text" name="' . $prefix . '_hh" id="hh" ' .
+        $hour = '<input type="text" name="' . $prefix . '_hh" class="hh" ' .
             'value="' . $hh . '" size="2" maxlength="2" autocomplete="off" />';
 
-        $minute = '<input type="text" name="' . $prefix . '_mn" id="mn" ' .
+        $minute = '<input type="text" name="' . $prefix . '_mn" class="mn" ' .
             'value="' . $mn . '" size="2" maxlength="2" autocomplete="off" />';
 
         /* translators: 1: month input, 2: day input, 3: year input, 4: hour input, 5: minute input */
