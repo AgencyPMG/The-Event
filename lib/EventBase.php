@@ -16,7 +16,7 @@ namespace PMG\TheEvent;
 
 class EventBase
 {
-    const ASSET_VERSION = '20150529.1';
+    const ASSET_VERSION = '20150529.2';
 
     /**
      * Event post type.

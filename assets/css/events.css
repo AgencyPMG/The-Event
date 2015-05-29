@@ -6,7 +6,7 @@
   font-size: 12px;
 }
 
-#event-publish-div input {
+#event-publish-div input[type="text"] {
   border-width: 1px;
   border-style: solid;
   padding: 1px;
