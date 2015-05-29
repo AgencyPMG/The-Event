@@ -31,6 +31,7 @@ namespace PMG\TheEvent;
 !defined('ABSPATH') && exit;
 
 define('PMG_TE_PATH', plugin_dir_path(__FILE__));
+define('PMG_TE_URL', plugins_url('/', __FILE__));
 define('PMG_EVENT_EP', 262144);
 
 require_once PMG_TE_PATH . 'lib/functions.php';
