@@ -48,6 +48,8 @@ class Event extends EventBase
             10,
             2
         );
+
+        add_filter('wpseo_json_ld_output', array(__CLASS__, 'event_json_ld'), 10, 2);
     }
 
     public static function register_type()
@@ -182,5 +184,49 @@ class Event extends EventBase
         }
 
         return $where;
+    }
+
+    public static function event_json_ld($output, $context)
+    {
+        if ('website' !== $context || !is_singular(self::EVENT_TYPE)) {
+            return $output;
+        }
+
+        $post = get_queried_object();
+        $venue = _te_get_event_venue($post);
+
+        // without the venue we can't output valid JSON-LD, so skip it
+        if (apply_filters('te_disable_event_json_ld', !$venue, $post)) {
+            return $output;
+        }
+
+        $output = [
+            '@context'      => 'http://schema.org',
+            '@type'         => 'Event',
+            'name'          => strip_tags($post->post_title),
+            'startDate'     => te_get_end_date(DATE_ISO8601, $post),
+            'location'      => [
+                '@type'         => 'Place',
+                'name'          => strip_tags($venue->post_title),
+                'address'       => [
+                    '@type'             => 'PostalAddress',
+                    'streetAddress'     => te_get_event_street1($post),
+                    'addressLocality'   => te_get_event_city($post),
+                    'addressRegion'     => te_get_event_state($post),
+                    'addressCountry'    => te_get_event_country($post),
+                    'postalCode'        => te_get_event_postal($post),
+                ],
+            ],
+        ];
+
+        if ($vurl = te_get_event_venue_url($post)) {
+            $output['location']['sameAs'] = $vurl;
+        }
+
+        if ($street2 = te_get_event_street1($post)) {
+            $output['location']['address']['streetAddress'] .= ", {$street2}";
+        }
+
+        return $output;
     }
 } // end class Event
