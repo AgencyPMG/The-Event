@@ -200,24 +200,24 @@ class Event extends EventBase
             return $output;
         }
 
-        $output = [
+        $output = array(
             '@context'      => 'http://schema.org',
             '@type'         => 'Event',
             'name'          => strip_tags($post->post_title),
             'startDate'     => te_get_end_date(DATE_ISO8601, $post),
-            'location'      => [
+            'location'      => array(
                 '@type'         => 'Place',
                 'name'          => strip_tags($venue->post_title),
-                'address'       => [
+                'address'       => array(
                     '@type'             => 'PostalAddress',
                     'streetAddress'     => te_get_event_street1($post),
                     'addressLocality'   => te_get_event_city($post),
                     'addressRegion'     => te_get_event_state($post),
                     'addressCountry'    => te_get_event_country($post),
                     'postalCode'        => te_get_event_postal($post),
-                ],
-            ],
-        ];
+                ),
+            ),
+        );
 
         if ($vurl = te_get_event_venue_url($post)) {
             $output['location']['sameAs'] = $vurl;
