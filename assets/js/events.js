@@ -2,14 +2,15 @@
 
     function isValidDate($wrap) {
         var year = $wrap.find('.aa').val();
-        var month = $wrap.find('.mm').val() - 1;
+        var month = parseInt($wrap.find('.mm').val()) - 1;
         var day = $wrap.find('.jj').val();
         var hour = $wrap.find('.hh').val();
         var min = $wrap.find('.mn').val();
-        var attempt = new Date(year, month-1, day, hour, min);
+        var attempt = new Date(year, month, day, hour, min);
+        console.log(year, month, day, hour, min);
 
         return attempt.getFullYear() == year &&
-               (attempt.getMonth() + 1) == month &&
+               attempt.getMonth() == month &&
                attempt.getDate() == day &&
                attempt.getHours() == hour &&
                attempt.getMinutes() == min;
