@@ -362,13 +362,16 @@ class EventAdmin extends Event
 
     public static function change_dates($data, $postarr)
     {
-        if(static::EVENT_TYPE != $data['post_type'])
+        if (static::EVENT_TYPE != $data['post_type']) {
             return $data;
+        }
 
         if(
             !isset($_POST[self::DATE_NONCE]) ||
             !wp_verify_nonce($_POST[self::DATE_NONCE], self::DATE_NONCE . $postarr['ID'])
-        ) return $data;
+        ) {
+            return $data;
+        }
 
         $types = array(
             'aa' => 'Y',
@@ -409,6 +412,16 @@ class EventAdmin extends Event
             } else {
                 $data['post_modified'] = $fmt;
             }
+        }
+
+        // WordPress likes to change this from what was actually submitted based
+        // on the post publish date. Since we use that to do our own date stuff
+        // we need to make sure to change it back
+        if (
+            !empty($postarr['post_status']) &&
+            in_array($postarr['post_status'], array('publish', 'draft', 'private'))
+        ) {
+            $data['post_status'] = $postarr['post_status'];
         }
 
         return $data;
