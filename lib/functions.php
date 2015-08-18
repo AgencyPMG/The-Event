@@ -292,6 +292,7 @@ function pmg_events_countries()
             'ZM' => __('Zambia', 'the-event'),
             'ZW' => __('Zimbabwe', 'the-event'),
         ));
+        asort($others);
 
         $countries = apply_filters('pmg_events_countries', array_merge($preferred, $others));
     }
