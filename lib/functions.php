@@ -38,9 +38,12 @@ function pmg_events_countries()
     static $countries = null;
 
     if (null === $countries) {
-        $countries = apply_filters('pmg_event_countries', array(
+        $preferred = apply_filters('pmg_events_preferred_countries', array(
             'US' => __('United States of America', 'the-event'),
             'CA' => __('Canada', 'the-event'),
+        ));
+
+        $others = apply_filters('pmg_events_other_countries', array(
             'AD' => __('Andorra', 'the-event'),
             'AE' => __('United Arab Emirates', 'the-event'),
             'AF' => __('Afghanistan', 'the-event'),
@@ -289,6 +292,8 @@ function pmg_events_countries()
             'ZM' => __('Zambia', 'the-event'),
             'ZW' => __('Zimbabwe', 'the-event'),
         ));
+
+        $countries = apply_filters('pmg_events_countries', array_merge($preferred, $others));
     }
 
     return $countries;
