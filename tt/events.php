@@ -134,8 +134,9 @@ function _te_get_venue_meta($post, $mk)
 
     $res = false;
 
-    if($venue)
+    if ($venue) {
         $res = Meta::instance('post')->get($venue->ID, $mk);
+    }
 
     return $res;
 }
@@ -211,7 +212,7 @@ function te_event_postal()
 function te_get_event_country($post)
 {
     return apply_filters('te_get_event_country',
-        _te_get_venue_meta($post, 'venue_country'), $post->ID);
+        pmg_events_country_name(_te_get_venue_meta($post, 'venue_country')), $post->ID);
 }
 
 function te_event_country()
@@ -220,6 +221,21 @@ function te_event_country()
 
     echo apply_filters('te_event_country',
         te_get_event_country($post), $post->ID);
+}
+
+function te_get_event_countrycode($post)
+{
+    return apply_filters(
+        'te_get_event_countrycode',
+        _te_get_venue_meta($post, 'venue_country'),
+        $post->ID
+    );
+}
+
+function te_event_countrycode()
+{
+    global $post;
+    echo apply_filters('te_event_countrycode', te_get_event_countrycode($post), $post->ID);
 }
 
 function te_get_event_venue_url($post)

@@ -99,7 +99,11 @@ class VenueAdmin extends Venue
         ));
 
         $f->add_field('venue_country', array(
-            'label' => __('Country', 'the-event'),
+            'type'      => 'select',
+            'label'     => __('Country', 'the-event'),
+            'options'   => array_merge(array(
+                '' => __('Select a Country', 'the-event'),
+            ), pmg_events_countries()),
         ));
 
         $f->add_field('venue_url', array(
