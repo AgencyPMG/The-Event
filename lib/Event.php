@@ -49,7 +49,7 @@ class Event extends EventBase
             2
         );
 
-        add_filter('wpseo_json_ld_output', array(__CLASS__, 'event_json_ld'), 10, 2);
+        add_filter('wp_head', array(__CLASS__, 'event_json_ld'), 100);
     }
 
     public static function register_type()
@@ -186,10 +186,10 @@ class Event extends EventBase
         return $where;
     }
 
-    public static function event_json_ld($output, $context)
+    public static function event_json_ld()
     {
-        if ('website' !== $context || !is_singular(self::EVENT_TYPE)) {
-            return $output;
+        if (!is_singular(self::EVENT_TYPE)) {
+            return;
         }
 
         $post = get_queried_object();
@@ -197,7 +197,7 @@ class Event extends EventBase
 
         // without the venue we can't output valid JSON-LD, so skip it
         if (apply_filters('te_disable_event_json_ld', !$venue, $post)) {
-            return $output;
+            return;
         }
 
         $output = array(
@@ -227,6 +227,11 @@ class Event extends EventBase
             $output['location']['address']['streetAddress'] .= ", {$street2}";
         }
 
-        return $output;
+        if ($out = apply_filters('te_event_json_ld', $output, $post, $venue)) {
+            printf(
+                '<script type="application/ld+json">%s</script>',
+                function_exists('wp_json_encode') ? wp_json_encode($out) : json_encode($out)
+            );
+        }
     }
 } // end class Event
