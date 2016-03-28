@@ -18,6 +18,8 @@ namespace PMG\TheEvent;
 
 class Event extends EventBase
 {
+    const QUERY_FLAG = 'pmg:events:override';
+
     public static function init()
     {
         add_action(
@@ -143,42 +145,33 @@ class Event extends EventBase
 
     public static function set_order($q)
     {
-        if(is_admin() || !$q->is_main_query())
-            return;
-
-        if(
-            !is_post_type_archive(static::EVENT_TYPE) &&
-            !is_tax(array(static::EVENT_CAT, static::EVENT_TAG))
-        ) return;
-
-        $q->set('orderby', 'post_date post_title');
-        $q->set('order', 'ASC');
+        if (!is_admin() && self::isEventQuery($q)) {
+            $q->set('orderby', 'post_date post_title');
+            $q->set('order', 'ASC');
+        }
     }
 
     public static function remove_old($where, $q)
     {
         global $wpdb;
 
-        if (is_admin() || !$q->is_main_query()) {
+        if (is_admin() || !self::isEventQuery($q)) {
             return $where;
         }
 
-        if(
-            is_post_type_archive(static::EVENT_TYPE) ||
-            is_tax(array(static::EVENT_CAT, static::EVENT_TAG))
-        ) {
+        if (self::isEventArchive($q)) {
             $where .= $wpdb->prepare(
                 " AND DATE({$wpdb->posts}.post_modified) >= %s",
                 date('Y-m-d')
             );
-        } elseif (is_search()) {
+        } elseif ($q->is_search()) {
             $where .= $wpdb->prepare(
                 " AND {$wpdb->posts}.ID NOT IN (
                     SELECT ID FROM {$wpdb->posts} WHERE
                     {$wpdb->posts}.post_type = %s AND 
                     DATE({$wpdb->posts}.post_modified) < %s AND
                     {$wpdb->posts}.post_status = 'publish')",
-                static::EVENT_TYPE,
+                self::EVENT_TYPE,
                 date('Y-m-d')
             );
         }
@@ -233,5 +226,15 @@ class Event extends EventBase
                 function_exists('wp_json_encode') ? wp_json_encode($out) : json_encode($out)
             );
         }
+    }
+
+    private static function isEventQuery(\WP_Query $q)
+    {
+        return ($q->is_main_query() || $q->get(self::QUERY_FLAG)) && self::isEventArchive($q);
+    }
+
+    private static function isEventArchive(\WP_Query $q)
+    {
+        return $q->is_post_type_archive(self::EVENT_TYPE) || $q->is_tax(array(self::EVENT_CAT, self::EVENT_TAG));
     }
 } // end class Event
