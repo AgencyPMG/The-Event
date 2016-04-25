@@ -145,7 +145,7 @@ class Event extends EventBase
 
     public static function set_order($q)
     {
-        if (!is_admin() && self::isEventQuery($q)) {
+        if (!self::isAdmin() && self::isEventQuery($q)) {
             $q->set('orderby', 'post_date post_title');
             $q->set('order', 'ASC');
         }
@@ -155,7 +155,7 @@ class Event extends EventBase
     {
         global $wpdb;
 
-        if (is_admin() || !self::isEventQuery($q)) {
+        if (self::isAdmin() || !self::isEventQuery($q)) {
             return $where;
         }
 
@@ -236,5 +236,15 @@ class Event extends EventBase
     private static function isEventArchive(\WP_Query $q)
     {
         return $q->is_post_type_archive(self::EVENT_TYPE) || $q->is_tax(array(self::EVENT_CAT, self::EVENT_TAG));
+    }
+
+    private static function isAjax()
+    {
+        return defined('DOING_AJAX') && DOING_AJAX;
+    }
+
+    private static function isAdmin()
+    {
+        return is_admin() && !self::isAjax();
     }
 } // end class Event
