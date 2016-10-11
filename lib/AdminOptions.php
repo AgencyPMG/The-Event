@@ -83,6 +83,13 @@ class AdminOptions extends EventBase
             'class'     => 'regular-text',
         ));
 
+        $f->add_field('cat_slug', array(
+            'label'     => __('Category Base', 'the-event'),
+            'cleaners'  => array('sanitize_title_with_dashes'),
+            'section'   => 'slugs',
+            'class'     => 'regular-text',
+        ));
+
         $f->add_field('artist_archive_disabled', array(
             'label'     => __('Disable the Artist Archive', 'the-event'),
             'section'   => 'artists',

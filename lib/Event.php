@@ -168,7 +168,7 @@ class Event extends EventBase
             $where .= $wpdb->prepare(
                 " AND {$wpdb->posts}.ID NOT IN (
                     SELECT ID FROM {$wpdb->posts} WHERE
-                    {$wpdb->posts}.post_type = %s AND 
+                    {$wpdb->posts}.post_type = %s AND
                     DATE({$wpdb->posts}.post_modified) < %s AND
                     {$wpdb->posts}.post_status = 'publish')",
                 self::EVENT_TYPE,
