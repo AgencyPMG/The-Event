@@ -85,7 +85,7 @@ class AdminOptions extends EventBase
 
         $f->add_field('cat_slug', array(
             'label'     => __('Category Base', 'the-event'),
-            'cleaners'  => array('sanitize_title_with_dashes'),
+            'cleaners'  => array('sanitize_text_field'),
             'section'   => 'slugs',
             'class'     => 'regular-text',
         ));
